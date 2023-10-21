@@ -19,7 +19,6 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-
 public class Indexer {
     // Metodo per indicizzare un singolo file
     private void indexFile(IndexWriter writer, File file) {
