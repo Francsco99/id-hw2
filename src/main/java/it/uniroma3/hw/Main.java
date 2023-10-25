@@ -10,14 +10,9 @@ public class Main {
 
         Indexer i = new Indexer();
         i.readFile(indexPath,dataPath);
-		/*
-		 Searcher s = new Searcher();
 
-		 s.consoleQuery(indexPath);
-		 /*
-		 * QueryParser parser = new QueryParser("contenuto", new WhitespaceAnalyzer());
-		 * Query query = parser.parse("luogo"); s.insertQuery(indexPath,query,false);
-		 */
+		 Searcher s = new Searcher();
+         s.eseguiQuery(indexPath);
 
     }
 }

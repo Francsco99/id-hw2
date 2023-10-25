@@ -19,6 +19,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+
 public class Indexer {
     // Metodo per indicizzare un singolo file
     private void indexFile(IndexWriter writer, File file) {
@@ -28,7 +29,8 @@ public class Indexer {
             Document doc = new Document();
 
             // Indicizzare il nome del file come StringField
-            Field titolo = new StringField("titolo", file.getName(), Field.Store.YES);
+            String nomeFile = file.getName().replaceFirst("\\.txt$", ""); // Rimuovo quello che è dopo il .txt
+            Field titolo = new TextField("titolo", nomeFile, Field.Store.YES);
             doc.add(titolo);
 
             // Indicizzare il contenuto del file come TextField
@@ -84,9 +86,12 @@ public class Indexer {
 
             if(files != null) {
                 for(File file : files) {
+                    long file_Start_Time = System.currentTimeMillis(); // faccio partire il tempo
                     if (file.getName().endsWith(".txt")) {
                         indexFile(writer, file);
-                        System.out.println("Letto file: "+file.getName());
+                        long file_End_Time = System.currentTimeMillis(); // fermo il tempo
+                        System.out.println("Letto file: "+file.getName()+" "+(file_End_Time-file_Start_Time)+ " ms");
+
                     }
                 }
             }

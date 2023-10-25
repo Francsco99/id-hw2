@@ -9,12 +9,9 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.Explanation;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.*;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
@@ -34,8 +31,8 @@ public class Searcher {
                 Document doc = indexSearcher.doc(scoreDoc.doc);
                 System.out.println("doc"+scoreDoc.doc + ":"+ doc.get("titolo") + " (" + scoreDoc.score +")");
                 if (explain) {
-                    Explanation explanation = indexSearcher.explain(query, scoreDoc.doc);
-                    System.out.println(explanation);
+                   Explanation explanation = indexSearcher.explain(query, scoreDoc.doc);
+                   System.out.println(explanation);
                 }
             }
 
@@ -45,13 +42,9 @@ public class Searcher {
 
     }
 
-    public void consoleQuery(String indexPath) {
+    public void eseguiQuery(String indexPath){
         Scanner scanner = new Scanner(System.in);
-
-        //booleano per scegliere se inserire un'altra query
-        boolean continuaQuery= true;
-
-        try {
+        try{
             // Directory degli indici
             Directory directory = FSDirectory.open(Paths.get(indexPath));
             // Creo un reader per accedere agli indici
@@ -59,39 +52,37 @@ public class Searcher {
             // Creo un searcher per cercare tra gli indici
             IndexSearcher indexSearcher = new IndexSearcher(indexReader);
 
-            while(continuaQuery) {
-                // Messaggio per l'utente
-                System.out.println("Inserisci la tua query (esempio: 'titolo:pippo' o 'contenuto:pluto'):\n");
-                // Input dell'utente
-                String queryString = scanner.nextLine();
-                // Nuovo searcher
-                Searcher s = new Searcher();
+            // Messaggio per l'utente
+            System.out.println("Inserisci la tua query (esempio: 'titolo:pippo' o 'contenuto:pluto'):\n");
+            // Input dell'utente
+            String inputUtente = scanner.nextLine();
 
-                if (queryString.startsWith("titolo:")) {
-                    String titolo = queryString.substring(7); // Estrai la parte dopo "titolo:"
-                    QueryParser parser = new QueryParser("titolo", new WhitespaceAnalyzer());
-                    Query query = parser.parse(titolo); s.insertQuery(indexPath,query,false);
+            //Dividi la stringa in due sottostringhe separate dai :
+            String[] parts = inputUtente.split(":");
+            String campo = new String();
+            String frase = new String();
 
-                } else if (queryString.startsWith("contenuto:")) {
-                    String contenuto = queryString.substring(10); // Estrai la parte dopo "contenuto:"
-                    QueryParser parser = new QueryParser("contenuto", new StandardAnalyzer());
-                    Query query = parser.parse(contenuto); s.insertQuery(indexPath,query,false);
+            Searcher s = new Searcher();
 
-                } else {
-                    System.out.println("Formato non riconosciuto. Inserisci 'titolo:qualcosa' o 'contenuto:qualcosa'.");
-                }
-
-                // Ask the user if they want to enter another query
-                System.out.println("Vuoi inserire un'altra query? (si/no)\n");
-                String userInput = scanner.nextLine().toLowerCase();
-
-                if (userInput.equals("no")) {
-                    continuaQuery = false;
-                }
+            if(parts.length == 2){
+                campo = parts[0].trim();
+                frase =parts[1].trim();
             }
-        }catch (Exception e) {
+            else {
+                System.out.println("Stringa non valida. Deve essere nel formato 'titolo:pippo' o 'contenuto:pluto'.");
+            }
+            PhraseQuery.Builder builder = new PhraseQuery.Builder();
+            for(String parola : frase.split(" ")){
+                Term term = new Term(campo,parola);
+                builder.add(term);
+            }
+            PhraseQuery query = builder.build();
+            s.insertQuery(indexPath,query,false);
+
+
+
+        }catch(Exception e){
             e.printStackTrace();
         }
-
     }
 }
