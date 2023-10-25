@@ -1,5 +1,7 @@
 package it.uniroma3.hw;
 
+import java.util.Scanner;
+
 public class Main {
 
     public static void main(String[] args) throws org.apache.lucene.queryparser.classic.ParseException{
@@ -11,8 +13,8 @@ public class Main {
         Indexer i = new Indexer();
         i.readFile(indexPath,dataPath);
 
-		 Searcher s = new Searcher();
-         s.eseguiQuery(indexPath);
+        Searcher s = new Searcher();
+        s.eseguiQuery(indexPath);
 
     }
 }
